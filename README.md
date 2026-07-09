@@ -40,12 +40,42 @@ run.bat
 
 (또는 `python main.py`)
 
-## Schedule
+## Schedule (Windows Task Scheduler)
 
-Windows 작업 스케줄러로 **매일 15:50** (장 마감 직후) `run.bat`을 실행하도록 등록합니다.
+장 마감 후 1일 1회 실행을 권장합니다 (평일 **15:50~16:30**).
+
+1. CREON Plus에 로그인된 세션이 있는 Windows 계정으로 작업 등록
+2. **기본 작업 만들기** → 트리거: 매주 월–금, 시작 시각 예) `15:50`
+3. 동작: 프로그램 시작
+   - 프로그램/스크립트:  
+     `C:\Users\lkh07\Desktop\Claude\cans\run.bat`  
+     (또는 이 워크트리 경로의 `run.bat`)
+   - 인수: `nopause`  (스케줄러에서 pause 대기 방지)
+   - 시작 위치: `run.bat`이 있는 프로젝트 폴더
+4. 조건/설정: 로그인 상태에서도 실행, 배터리·유휴 제한 해제 권장
+5. 재실행 방지: `.env`의 `SKIP_IF_ALREADY_RAN_TODAY=true` (기본)이면 당일 성공 run 후 스킵
+
+수동 실행:
+
+```bat
+run.bat
+run.bat nopause
+```
+
+로그: `logs/earnings_dip.log`  
+상태: `state/last_run.json`, `state/last_candidates.json`
+
+### Exit codes
+
+| Code | 의미 |
+|------|------|
+| 0 | 성공 또는 당일 이미 실행으로 스킵 |
+| 1 | 실패 (DART 키 없음, 시세 전 경로 실패, 텔레그램 미설정/전송 실패, 미처리 예외 등) |
+
+에러 시 가능하면 텔레그램 `[ERROR] earnings-dip: ...` 알림을 보냅니다.
 
 ## Tests
 
 ```bat
-python -m pytest tests/ -v
+"C:\Users\lkh07\AppData\Local\Programs\Python\Python311-32\python.exe" -m pytest tests -v
 ```
